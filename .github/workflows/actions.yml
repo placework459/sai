@@ -42,26 +42,3 @@ jobs:
       - name: Run Pytest with coverage and html report
         run: |
           pytest --cov=your_package --cov-report=html
-
-       name: Get Commit hash
-        id: vars
-        run: echo "GIT_SHA=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
-
-      - name: Build Docker Image with commit hash
-        run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/${{ env.DOCKER_IMAGE_NAME }}:${{ env.GIT_SHA }} \
-                       -t ${{ secrets.DOCKER_USERNAME }}/${{ env.DOCKER_IMAGE_NAME }}:latest .
-      
-      - name: Scan Docker images with Trivy
-        uses: aquasecurity/trivy-action@0.28.0
-        with:
-          image-ref: ${{ secrets.DOCKER_USERNAME }}/${{ env.DOCKER_IMAGE_NAME }}:${{ env.GIT_SHA }}
-          format: table
-          exit-code: 1 # fail if vulnerabilities are found 
-          severity: "CRITICAL,HIGH"
-          
-      - name: Push Docker Image
-        run: |
-          echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
-          docker push ${{ secrets.DOCKER_USERNAME }}/${{ env.DOCKER_IMAGE_NAME }}:${{ env.GIT_SHA }}
-          docker push ${{ secrets.DOCKER_USERNAME }}/${{ env.DOCKER_IMAGE_NAME }}:latest
