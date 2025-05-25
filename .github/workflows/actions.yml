@@ -21,7 +21,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
         with:
-          fetch-depth: 0  # Needed for full git history for Hugging Face
+          fetch-depth: 0
           lfs: true
 
       - name: Set up Java 17
@@ -43,6 +43,20 @@ jobs:
       - name: Run Pytest with coverage
         run: |
           pytest --cov=. --cov-report=term
+
+      - name: Install SonarScanner
+        run: |
+          npm install -g sonar-scanner
+
+      - name: Run SonarScanner
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          sonar-scanner \
+            -Dsonar.projectKey=${{ env.SONAR_PROJECT_KEY }} \
+            -Dsonar.organization=${{ env.SONAR_ORGANIZATION }} \
+            -Dsonar.host.url=${{ env.SONAR_HOST_URL }} \
+            -Dsonar.login=${{ secrets.SONAR_TOKEN }}
 
       - name: Get Commit hash
         id: vars
@@ -81,17 +95,3 @@ jobs:
           echo "Setting remote for Hugging Face Space"
           git remote add huggingface https://oauth2:${HF_TOKEN}@${HF_SPACE_REPO_URL#https://}
           
-          echo "Pushing to Hugging Face Space: ${{ env.HF_SPACE_REPO_URL }}"
-          git push --force huggingface main
-          
-          echo "Successfully pushed to Hugging Face Space"
-
-      - name: SonarQube Scan
-        uses: sonarsource/sonarqube-scan-action@v1
-        with:
-          args: >
-            -Dsonar.projectKey=${{ env.SONAR_PROJECT_KEY }}
-            -Dsonar.organization=${{ env.SONAR_ORGANIZATION }}
-            -Dsonar.host.url=${{ env.SONAR_HOST_URL }}
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
