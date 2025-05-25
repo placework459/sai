@@ -94,4 +94,14 @@ jobs:
           
           echo "Setting remote for Hugging Face Space"
           git remote add huggingface https://oauth2:${HF_TOKEN}@${HF_SPACE_REPO_URL#https://}
-          
+          git push --force huggingface main
+          echo "Successfully pushed to Hugging Face Space"
+
+      - name: Slack Notification
+        if: always()
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          fields: repo, message, author, job, ref
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
