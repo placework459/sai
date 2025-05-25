@@ -70,18 +70,28 @@ jobs:
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
+          # Ensure git-lfs is installed (GitHub runners usually have it, but good practice)
           sudo apt-get update
           sudo apt-get install -y git-lfs
-          git lfs install --system
+          git lfs install --system # Initialize LFS for the system
 
+          # The 'actions/checkout' step above has already cloned your repository
+          # and fetched LFS files because of `lfs: true` and `Workspace-depth: 0`.
+
+          # Set up user for potential commits if needed (though direct push might not require a new commit)
           git config user.email "actions@github.com"
           git config user.name "GitHub Actions"
-
-          echo "Setting remote for Hugging Face Space"
-          git remote add huggingface https://oauth2:${HF_TOKEN}@${{ env.HF_SPACE_REPO_URL#https:// }}
-
-          echo "Pushing to Hugging Face Space"
-          git push --force huggingface main
-
-          echo "Successfully pushed to Hugging Face Space"
           
+          echo "Setting remote for Hugging Face Space"
+          # Add the Hugging Face Space as a remote.
+          # The URL uses oauth2 for token-based authentication.
+          git remote add huggingface https://oauth2:${HF_TOKEN}@${HF_SPACE_REPO_URL#https://}
+          
+          echo "Pushing to Hugging Face Space: ${{ env.HF_SPACE_REPO_URL }}"
+          # Push the main branch to the Hugging Face Space.
+          # --force is used to overwrite the history on the Space, ensuring it matches your GitHub repo.
+          # This should resolve the "shallow update not allowed" because the local repo now has full history.
+          # LFS files will be pushed automatically.
+          git push --force huggingface main
+          
+          echo "Successfully pushed to Hugging Face Space"
