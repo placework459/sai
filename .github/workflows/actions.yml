@@ -9,7 +9,7 @@ on:
       - main
 
 env:
-  DOCKER_IMAGE_NAME: Namrata
+  DOCKER_IMAGE_NAME: ldpteam
   HF_SPACE_REPO_URL: https://huggingface.co/spaces/Namratakghodke/Housing_Price
   SONAR_PROJECT_KEY: namrata_assi3
   SONAR_ORGANIZATION: placework459
