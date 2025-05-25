@@ -1,5 +1,6 @@
 # Use a specific Python version (slim version to keep the image smaller)
-FROM python:3.11-slim
+FROM python:3.11-alpine
+
 
 # Set the working directory in the container (where the app will be located)
 WORKDIR /App
