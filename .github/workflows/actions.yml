@@ -9,7 +9,7 @@ on:
 env:
   DOCKER_IMAGE_NAME: namrata
   HF_SPACE_REPO_URL: https://huggingface.co/spaces/Namratakghodke/Housing_Price
-  SONAR_PROJECT_KEY: namrata_assi3
+  SONAR_PROJECT_KEY: placework459_sai
   SONAR_ORGANIZATION: placework459
   SONAR_HOST_URL: https://sonarcloud.io
 
@@ -95,3 +95,13 @@ jobs:
           git push --force huggingface main
           
           echo "Successfully pushed to Hugging Face Space"
+ - name: SonarQube Scan
+  uses: sonarsource/sonarqube-scan-action@v1
+  with:
+    args: >
+      -Dsonar.projectKey=${{ env.SONAR_PROJECT_KEY }}
+      -Dsonar.organization=${{ env.SONAR_ORGANIZATION }}
+      -Dsonar.host.url=${{ env.SONAR_HOST_URL }}
+  env:
+    SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
