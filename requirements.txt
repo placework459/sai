@@ -7,3 +7,5 @@ pytest-cov
 pytest-html
 httpx
 gradio
+setuptools==78.1.1  # Or the latest secure version
+
